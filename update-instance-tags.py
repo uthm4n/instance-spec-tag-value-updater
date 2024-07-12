@@ -22,11 +22,21 @@ log.setLevel(logging.DEBUG)
 
 
 def update_instance_tags():
-    INSTANCE_API = client.get('https://spec.wiremockapi.cloud/instance')
-    CONFIG_SPEC = client.get('https://spec.wiremockapi.cloud/configspec')
+    MORPHEUS_APPLIANCE_URL = morpheus['morpheus']['applianceUrl']
+    MORPHEUS_API_TOKEN = morpheus['morpheus']['apiAccessToken']  # provided a valid token here
+    MORPHEUS_HEADERS = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": f"Bearer {MORPHEUS_API_TOKEN}"
+    }
+    INSTANCE_ID = morpheus['instance']['id']
+    
+    INSTANCE_API = client.get(f"{MORPHEUS_APPLIANCE_URL}/api/instances/{INSTANCE_ID}", headers=headers, verify=False)
+    CONFIGSPEC = morpheus['spec']
+
     
     INSTANCE_API = INSTANCE_API.json()
-    CONFIG_SPEC = CONFIG_SPEC.json()
+#    CONFIG_SPEC = CONFIG_SPEC.json()
     
     JSONPATH = jsonpath.parse('$.instance.containerDetails[0].server.sourceImage.id')
     match = JSONPATH.find(INSTANCE_API)
